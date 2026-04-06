@@ -6,3 +6,5 @@ pandas
 python-dotenv
 Werkzeug
 gunicorn
+streamlit
+plotly
