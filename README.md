@@ -25,37 +25,7 @@ iris-ml-project/
 
 ## 🚀 Quick Start
 
-### Prerequisites
-- Python 3.8 or higher
-- pip (Python package manager)
 
-### Installation
-
-1. **Clone/Download the project**
-```bash
-cd iris-ml-project
-```
-
-2. **Create a virtual environment (optional but recommended)**
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-3. **Install dependencies**
-```bash
-pip install -r requirements.txt
-```
-
-4. **Run the application**
-```bash
-python app.py
-```
-
-5. **Open in browser**
-```
-http://localhost:5000
-```
 
 ## 🎯 How to Use
 
@@ -106,59 +76,6 @@ Returns the main HTML page with the web interface.
 ### GET `/api/model-info`
 Returns model information and statistics.
 
-**Response:**
-```json
-{
-  "model_type": "Random Forest Classifier",
-  "accuracy": 0.983,
-  "features": ["sepal length", "sepal width", "petal length", "petal width"],
-  "classes": ["setosa", "versicolor", "virginica"],
-  "test_samples": 30,
-  "feature_importance": {
-    "petal width (cm)": 0.45,
-    "petal length (cm)": 0.42,
-    "sepal length (cm)": 0.08,
-    "sepal width (cm)": 0.05
-  }
-}
-```
-
-### POST `/api/predict`
-Make a prediction for new flower data.
-
-**Request:**
-```json
-{
-  "sepal_length": 5.1,
-  "sepal_width": 3.5,
-  "petal_length": 1.4,
-  "petal_width": 0.2
-}
-```
-
-**Response:**
-```json
-{
-  "prediction": "setosa",
-  "confidence": 95.2,
-  "probabilities": {
-    "setosa": 95.2,
-    "versicolor": 4.5,
-    "virginica": 0.3
-  },
-  "timestamp": "2024-01-15T10:30:45.123456"
-}
-```
-
-### GET `/api/visualizations`
-Returns data for confusion matrix and visualizations.
-
-### GET `/api/dataset-stats`
-Returns statistics for each feature.
-
-### GET `/api/sample-predictions`
-Returns sample predictions from test set.
-
 ## 🎨 UI Features
 
 ### Design Highlights
@@ -175,30 +92,9 @@ Returns sample predictions from test set.
 - **Statistics**: Clean stat boxes with icons
 - **Tabs**: Organized information in tabbed sections
 
-## 🔧 Customization
 
-### Change Model Parameters
 
-Edit `app.py`:
-```python
-model = RandomForestClassifier(
-    n_estimators=150,      # Increase number of trees
-    random_state=42,
-    max_depth=15           # Increase depth
-)
-```
 
-### Change Color Scheme
-
-Edit CSS variables in `templates/index.html`:
-```css
-:root {
-    --primary: #667eea;        /* Primary color */
-    --secondary: #764ba2;      /* Secondary color */
-    --accent: #f093fb;         /* Accent color */
-    /* ... more colors ... */
-}
-```
 
 ## 📈 Performance Metrics
 
@@ -212,26 +108,7 @@ Predictions are made in < 10ms per request.
 Model size: ~1-2 MB
 Application footprint: ~50 MB (including dependencies)
 
-## 🐛 Troubleshooting
 
-### Port Already in Use
-If port 5000 is busy, change it in `app.py`:
-```python
-app.run(debug=True, host='0.0.0.0', port=5001)
-```
-
-### Module Import Errors
-Ensure all dependencies are installed:
-```bash
-pip install -r requirements.txt --upgrade
-```
-
-### CORS Issues
-The app is configured to handle CORS. If you encounter issues, uncomment in `app.py`:
-```python
-from flask_cors import CORS
-CORS(app)
-```
 
 ## 📚 Dataset Information
 
@@ -242,44 +119,8 @@ CORS(app)
 - **Features**: 4
 - **Classes**: 3
 
-## 🌐 Deployment
 
-### Deploy to Heroku
-```bash
-heroku create your-app-name
-git push heroku main
-```
 
-### Deploy to PythonAnywhere
-1. Upload files to PythonAnywhere
-2. Set up virtual environment
-3. Configure web app settings
-4. Reload
-
-### Deploy to AWS/GCP
-Use containerization:
-```bash
-docker build -t iris-ml .
-docker run -p 5000:5000 iris-ml
-```
-
-## 📝 License
-
-This project is open source and available under the MIT License.
-
-## 🤝 Contributing
-
-Contributions are welcome! Feel free to:
-- Report bugs
-- Suggest improvements
-- Submit pull requests
-- Improve documentation
-
-## 📧 Contact
-
-For questions or feedback, please reach out!
-
----
 
 **Built with ❤️ using Flask, Scikit-learn, and modern web technologies**
 
