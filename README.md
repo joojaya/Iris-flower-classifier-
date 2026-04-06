@@ -63,18 +63,6 @@ iris-ml-project/
 3. Petal Length (cm)
 4. Petal Width (cm)
 
-### Classes (Output)
-- Setosa
-- Versicolor
-- Virginica
-
-## 📡 API Endpoints
-
-### GET `/`
-Returns the main HTML page with the web interface.
-
-### GET `/api/model-info`
-Returns model information and statistics.
 
 ## 🎨 UI Features
 
@@ -107,17 +95,6 @@ Predictions are made in < 10ms per request.
 ### Memory Usage
 Model size: ~1-2 MB
 Application footprint: ~50 MB (including dependencies)
-
-
-
-## 📚 Dataset Information
-
-### Iris Dataset
-- **Total Samples**: 150
-- **Training Samples**: 120 (80%)
-- **Test Samples**: 30 (20%)
-- **Features**: 4
-- **Classes**: 3
 
 
 
