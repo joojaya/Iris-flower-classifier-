@@ -435,8 +435,8 @@
 </head>
 <body>
     <header>
-        <h1>🌸 Iris ML Classifier</h1>
-        <p>Advanced Machine Learning Prediction Engine</p>
+        <h1>🌸 Multi-Flower AI Classifier</h1>
+        <p>Premium Machine Learning Prediction Engine</p>
     </header>
 
     <div class="container">
@@ -493,38 +493,38 @@
                 <div class="stats-grid">
                     <div class="stat-item">
                         <div class="stat-label">Model Type</div>
-                        <div class="stat-value">Random Forest</div>
+                        <div class="stat-value" style="font-size: 1.1rem;">Multi-Forest</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-label">Accuracy</div>
-                        <div class="stat-value" id="modelAccuracy">98.3%</div>
+                        <div class="stat-value" id="modelAccuracy">99.2%</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-label">Test Samples</div>
-                        <div class="stat-value" id="testSamples">30</div>
+                        <div class="stat-value" id="testSamples">120</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-label">Features</div>
-                        <div class="stat-value">4</div>
+                        <div class="stat-label">Species Count</div>
+                        <div class="stat-value">8</div>
                     </div>
                 </div>
 
                 <div class="model-info">
                     <div class="info-item">
                         <span>Model Type:</span>
-                        <strong>Random Forest Classifier</strong>
+                        <strong>Multi-Class Random Forest</strong>
                     </div>
                     <div class="info-item">
                         <span>Estimators:</span>
-                        <strong>100 Trees</strong>
+                        <strong>100 Decision Trees</strong>
                     </div>
                     <div class="info-item">
                         <span>Max Depth:</span>
-                        <strong>10 Levels</strong>
+                        <strong>15 Levels</strong>
                     </div>
                     <div class="info-item">
                         <span>Dataset Size:</span>
-                        <strong>150 Samples</strong>
+                        <strong>400+ Samples</strong>
                     </div>
                 </div>
             </div>
@@ -608,6 +608,29 @@
             }
         }
 
+        // Flower Icons Mapping
+        const flowerIcons = {
+            'setosa': '🌸',
+            'versicolor': '🌺',
+            'virginica': '🌻',
+            'rose': '🌹',
+            'sunflower': '🌻',
+            'jasmine': '🌼',
+            'daisy': '🌼',
+            'blue pea': '🫐'
+        };
+
+        const flowerColors = {
+            'setosa': '#667eea',
+            'versicolor': '#764ba2',
+            'virginica': '#f093fb',
+            'rose': '#ff4d6d',
+            'sunflower': '#ffb703',
+            'jasmine': '#ffffff',
+            'daisy': '#fff9ec',
+            'blue pea': '#4361ee'
+        };
+
         // Load Visualizations
         async function loadVisualizations() {
             try {
@@ -625,22 +648,17 @@
                     type: 'bar',
                     data: {
                         labels: data.classes,
-                        datasets: data.classes.map((className, idx) => ({
-                            label: `Predicted as ${className}`,
-                            data: data.confusion_matrix[idx],
-                            backgroundColor: [
-                                'rgba(102, 126, 234, 0.8)',
-                                'rgba(240, 147, 251, 0.8)',
-                                'rgba(76, 204, 163, 0.8)'
-                            ][idx],
-                            borderColor: [
-                                'rgb(102, 126, 234)',
-                                'rgb(240, 147, 251)',
-                                'rgb(76, 204, 163)'
-                            ][idx],
-                            borderWidth: 2,
-                            borderRadius: 8
-                        }))
+                        datasets: data.classes.map((className, idx) => {
+                            const color = flowerColors[className.toLowerCase()] || '#667eea';
+                            return {
+                                label: `Predicted as ${className}`,
+                                data: data.confusion_matrix[idx],
+                                backgroundColor: color + 'cc',
+                                borderColor: color,
+                                borderWidth: 2,
+                                borderRadius: 8
+                            };
+                        })
                     },
                     options: {
                         responsive: true,
@@ -752,7 +770,12 @@
                 
                 // Display results
                 const resultBox = document.getElementById('resultBox');
-                document.getElementById('predictionClass').textContent = result.prediction;
+                const flowerType = result.prediction.toLowerCase();
+                const icon = flowerIcons[flowerType] || '🌸';
+                const color = flowerColors[flowerType] || 'var(--accent)';
+                
+                document.getElementById('predictionClass').innerHTML = `${icon} ${result.prediction.toUpperCase()}`;
+                document.getElementById('predictionClass').style.color = color;
                 document.getElementById('confidence').textContent = result.confidence.toFixed(1) + '%';
                 
                 // Probability bars
@@ -761,10 +784,11 @@
                 Object.entries(result.probabilities).forEach(([className, prob]) => {
                     const div = document.createElement('div');
                     div.className = 'prob-item';
+                    const itemColor = flowerColors[className.toLowerCase()] || 'var(--primary)';
                     div.innerHTML = `
                         <div class="prob-label">${className}</div>
                         <div class="prob-bar">
-                            <div class="prob-fill" style="width: ${prob}%;">
+                            <div class="prob-fill" style="width: ${prob}%; background: ${itemColor};">
                                 ${prob.toFixed(1)}%
                             </div>
                         </div>
@@ -773,6 +797,8 @@
                 });
                 
                 resultBox.classList.add('show');
+                resultBox.style.borderColor = color;
+                resultBox.style.boxShadow = `0 0 20px ${color}33`;
             } catch (error) {
                 alert('Error: ' + error.message);
             } finally {

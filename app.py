@@ -15,8 +15,37 @@ app.config['SECRET_KEY'] = 'your-secret-key-change-this'
 # ===================== ML MODEL SETUP =====================
 # Load and train the model
 iris = load_iris()
-X = iris.data
-y = iris.target
+X_iris = iris.data
+y_iris = iris.target
+class_names = list(iris.target_names)
+
+# --- Extend Dataset with Synthetic Flower Data ---
+def generate_flower_data(low, high, label, count=50):
+    return np.random.uniform(low, high, (count, 4)), np.full(count, label)
+
+# Specific data ranges for new flowers (simulated)
+# Features: [sepal_length, sepal_width, petal_length, petal_width]
+extra_flowers = {
+    'Rose': [6.0, 9.0, 3.0, 5.0, 4.0, 7.0, 1.5, 3.0],      # Large & wide petals
+    'Sunflower': [8.0, 15.0, 4.0, 8.0, 10.0, 20.0, 5.0, 10.0], # Huge flowers
+    'Jasmine': [3.0, 5.0, 2.0, 4.0, 1.0, 2.0, 0.5, 1.5],  # Small & delicate
+    'Daisy': [4.0, 6.0, 2.5, 4.5, 2.0, 4.0, 1.0, 2.0],   # Medium classic
+    'Blue Pea': [3.5, 5.5, 2.0, 3.5, 2.5, 4.5, 0.8, 1.8] # Small vibrant
+}
+
+X_extra, y_extra = [], []
+for i, (name, ranges) in enumerate(extra_flowers.items()):
+    X_f, y_f = generate_flower_data(
+        [ranges[0], ranges[2], ranges[4], ranges[6]], 
+        [ranges[1], ranges[3], ranges[5], ranges[7]], 
+        len(class_names) + i
+    )
+    X_extra.append(X_f)
+    y_extra.append(y_f)
+    class_names.append(name.lower())
+
+X = np.vstack([X_iris] + X_extra)
+y = np.concatenate([y_iris] + y_extra)
 
 # Split data
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -26,14 +55,17 @@ scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
-# Train Random Forest model
-model = RandomForestClassifier(n_estimators=100, random_state=42, max_depth=10)
+# Train Random Forest model - deeper trees for more classes
+model = RandomForestClassifier(n_estimators=100, random_state=42, max_depth=15)
 model.fit(X_train_scaled, y_train)
 
 # Model metrics
 y_pred = model.predict(X_test_scaled)
 accuracy = accuracy_score(y_test, y_pred)
 conf_matrix = confusion_matrix(y_test, y_pred)
+
+# Updated feature names for response
+feature_names = ["sepal_length", "sepal_width", "petal_length", "petal_width"]
 
 # Feature importance
 feature_importance = dict(zip(iris.feature_names, model.feature_importances_))
@@ -50,15 +82,15 @@ def home():
 def model_info():
     """Get model information"""
     return jsonify({
-        'model_type': 'Random Forest Classifier',
+        'model_type': 'Multi-Flower Classifier',
         'accuracy': float(accuracy),
-        'features': list(iris.feature_names),
-        'classes': list(iris.target_names),
+        'features': feature_names,
+        'classes': class_names,
         'test_samples': len(X_test),
         'feature_importance': feature_importance,
         'confusion_matrix': conf_matrix.tolist(),
         'n_estimators': 100,
-        'max_depth': 10
+        'max_depth': 15
     })
 
 @app.route('/api/predict', methods=['POST'])
@@ -87,10 +119,10 @@ def predict():
         probabilities = model.predict_proba(features_scaled)[0]
         
         return jsonify({
-            'prediction': iris.target_names[prediction],
+            'prediction': class_names[prediction],
             'confidence': float(max(probabilities) * 100),
             'probabilities': {
-                iris.target_names[i]: float(prob * 100)
+                class_names[i]: float(prob * 100)
                 for i, prob in enumerate(probabilities)
             },
             'timestamp': datetime.now().isoformat()
@@ -103,7 +135,7 @@ def visualizations():
     """Get data for visualizations"""
     return jsonify({
         'confusion_matrix': conf_matrix.tolist(),
-        'classes': list(iris.target_names),
+        'classes': class_names,
         'feature_importance': feature_importance,
         'model_accuracy': float(accuracy)
     })
@@ -112,7 +144,7 @@ def visualizations():
 def dataset_stats():
     """Get dataset statistics"""
     stats = {}
-    for i, feature in enumerate(iris.feature_names):
+    for i, feature in enumerate(feature_names):
         stats[feature] = {
             'min': float(np.min(X[:, i])),
             'max': float(np.max(X[:, i])),
@@ -140,9 +172,9 @@ def sample_predictions():
                 'petal_length': float(sample[2]),
                 'petal_width': float(sample[3])
             },
-            'predicted': iris.target_names[pred],
-            'actual': iris.target_names[actual],
-            'correct': pred == actual
+            'predicted': class_names[pred],
+            'actual': class_names[actual],
+            'correct': bool(pred == actual)
         })
     
     return jsonify(samples)
