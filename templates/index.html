@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌸 Iris ML Classifier - Advanced Prediction Engine</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --accent: #f093fb;
+            --success: #4ecca3;
+            --warning: #f5a623;
+            --danger: #d32f2f;
+            --bg-dark: #0f0f1e;
+            --bg-light: #1a1a2e;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --border-color: #2a2a3e;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a0033 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        header p {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .card:hover::before {
+            left: 100%;
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Input Form */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 0.875rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Result Box */
+        .result-box {
+            background: linear-gradient(135deg, rgba(76, 204, 163, 0.1) 0%, rgba(240, 147, 251, 0.1) 100%);
+            border: 1px solid var(--success);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+
+        .result-box.show {
+            display: block;
+        }
+
+        .result-box.error {
+            border-color: var(--danger);
+            background: linear-gradient(135deg, rgba(211, 47, 47, 0.1) 0%, rgba(211, 47, 47, 0.05) 100%);
+        }
+
+        .prediction-result {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .prediction-class {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .confidence {
+            font-size: 1.25rem;
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        /* Probability Bars */
+        .probability-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .prob-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .prob-label {
+            min-width: 100px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .prob-bar {
+            flex: 1;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .prob-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 0.5rem;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .stat-item {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 1.5rem;
+        }
+
+        /* Model Info */
+        .model-info {
+            background: rgba(102, 126, 234, 0.05);
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Feature Importance */
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            border-left: 3px solid var(--primary);
+        }
+
+        .feature-name {
+            font-weight: 500;
+        }
+
+        .feature-score {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 0.75rem 0;
+            color: var(--text-secondary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.75rem;
+            }
+
+            .grid {
+                gap: 1rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🌸 Iris ML Classifier</h1>
+        <p>Advanced Machine Learning Prediction Engine</p>
+    </header>
+
+    <div class="container">
+        <div class="grid">
+            <!-- Prediction Card -->
+            <div class="card">
+                <h2>🎯 Make Prediction</h2>
+                
+                <form id="predictionForm">
+                    <div class="form-group">
+                        <label for="sepal_length">Sepal Length (cm)</label>
+                        <input type="number" id="sepal_length" name="sepal_length" step="0.1" min="0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sepal_width">Sepal Width (cm)</label>
+                        <input type="number" id="sepal_width" name="sepal_width" step="0.1" min="0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="petal_length">Petal Length (cm)</label>
+                        <input type="number" id="petal_length" name="petal_length" step="0.1" min="0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="petal_width">Petal Width (cm)</label>
+                        <input type="number" id="petal_width" name="petal_width" step="0.1" min="0" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="predictBtn">
+                        <span>🚀 Predict Flower</span>
+                    </button>
+                </form>
+
+                <!-- Result Display -->
+                <div class="result-box" id="resultBox">
+                    <div class="prediction-result">
+                        <div class="prediction-class" id="predictionClass">Versicolor</div>
+                        <div class="confidence">
+                            <span id="confidence">95.2%</span> Confidence
+                        </div>
+                    </div>
+
+                    <div class="probability-bars" id="probabilityBars">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Model Info Card -->
+            <div class="card">
+                <h2>📊 Model Information</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-label">Model Type</div>
+                        <div class="stat-value">Random Forest</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Accuracy</div>
+                        <div class="stat-value" id="modelAccuracy">98.3%</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Test Samples</div>
+                        <div class="stat-value" id="testSamples">30</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Features</div>
+                        <div class="stat-value">4</div>
+                    </div>
+                </div>
+
+                <div class="model-info">
+                    <div class="info-item">
+                        <span>Model Type:</span>
+                        <strong>Random Forest Classifier</strong>
+                    </div>
+                    <div class="info-item">
+                        <span>Estimators:</span>
+                        <strong>100 Trees</strong>
+                    </div>
+                    <div class="info-item">
+                        <span>Max Depth:</span>
+                        <strong>10 Levels</strong>
+                    </div>
+                    <div class="info-item">
+                        <span>Dataset Size:</span>
+                        <strong>150 Samples</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Second Row -->
+        <div class="grid">
+            <!-- Feature Importance -->
+            <div class="card">
+                <h2>⭐ Feature Importance</h2>
+                <ul class="feature-list" id="featureImportance">
+                    <!-- Dynamically populated -->
+                </ul>
+            </div>
+
+            <!-- Visualizations -->
+            <div class="card">
+                <h2>📈 Model Performance</h2>
+                <div class="chart-container">
+                    <canvas id="confusionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Full Width Tabs -->
+        <div class="card">
+            <h2>📚 Additional Information</h2>
+            
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="dataset">Dataset Stats</button>
+                <button class="tab-btn" data-tab="samples">Sample Predictions</button>
+            </div>
+
+            <div id="dataset" class="tab-content active">
+                <div class="stats-grid" id="datasetStats" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+
+            <div id="samples" class="tab-content">
+                <div id="samplePredictions" style="display: flex; flex-direction: column; gap: 1rem;">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize
+        let modelData = {};
+        let confusionChart = null;
+
+        // Load initial data
+        async function loadModelData() {
+            try {
+                const response = await fetch('/api/model-info');
+                modelData = await response.json();
+                
+                // Update UI
+                document.getElementById('modelAccuracy').textContent = (modelData.accuracy * 100).toFixed(1) + '%';
+                document.getElementById('testSamples').textContent = modelData.test_samples;
+                
+                // Feature Importance
+                const featureList = document.getElementById('featureImportance');
+                featureList.innerHTML = '';
+                Object.entries(modelData.feature_importance).forEach(([name, score]) => {
+                    const li = document.createElement('li');
+                    li.className = 'feature-item';
+                    li.innerHTML = `
+                        <span class="feature-name">${name}</span>
+                        <span class="feature-score">${(score * 100).toFixed(1)}%</span>
+                    `;
+                    featureList.appendChild(li);
+                });
+
+                loadVisualizations();
+                loadDatasetStats();
+                loadSamplePredictions();
+            } catch (error) {
+                console.error('Error loading model data:', error);
+            }
+        }
+
+        // Load Visualizations
+        async function loadVisualizations() {
+            try {
+                const response = await fetch('/api/visualizations');
+                const data = await response.json();
+                
+                // Confusion Matrix Chart
+                const ctx = document.getElementById('confusionChart').getContext('2d');
+                
+                if (confusionChart) {
+                    confusionChart.destroy();
+                }
+                
+                confusionChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.classes,
+                        datasets: data.classes.map((className, idx) => ({
+                            label: `Predicted as ${className}`,
+                            data: data.confusion_matrix[idx],
+                            backgroundColor: [
+                                'rgba(102, 126, 234, 0.8)',
+                                'rgba(240, 147, 251, 0.8)',
+                                'rgba(76, 204, 163, 0.8)'
+                            ][idx],
+                            borderColor: [
+                                'rgb(102, 126, 234)',
+                                'rgb(240, 147, 251)',
+                                'rgb(76, 204, 163)'
+                            ][idx],
+                            borderWidth: 2,
+                            borderRadius: 8
+                        }))
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#b0b0b0' }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                ticks: { color: '#b0b0b0' },
+                                grid: { color: 'rgba(255,255,255,0.1)' }
+                            },
+                            x: {
+                                ticks: { color: '#b0b0b0' },
+                                grid: { color: 'rgba(255,255,255,0.1)' }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading visualizations:', error);
+            }
+        }
+
+        // Load Dataset Stats
+        async function loadDatasetStats() {
+            try {
+                const response = await fetch('/api/dataset-stats');
+                const stats = await response.json();
+                
+                const container = document.getElementById('datasetStats');
+                container.innerHTML = '';
+                
+                Object.entries(stats).forEach(([feature, data]) => {
+                    const div = document.createElement('div');
+                    div.className = 'stat-item';
+                    div.innerHTML = `
+                        <div class="stat-label">${feature}</div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                            <div>Min: <strong>${data.min.toFixed(2)}</strong></div>
+                            <div>Max: <strong>${data.max.toFixed(2)}</strong></div>
+                            <div>Mean: <strong>${data.mean.toFixed(2)}</strong></div>
+                            <div>Std: <strong>${data.std.toFixed(2)}</strong></div>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            } catch (error) {
+                console.error('Error loading dataset stats:', error);
+            }
+        }
+
+        // Load Sample Predictions
+        async function loadSamplePredictions() {
+            try {
+                const response = await fetch('/api/sample-predictions');
+                const samples = await response.json();
+                
+                const container = document.getElementById('samplePredictions');
+                container.innerHTML = '';
+                
+                samples.forEach((sample, idx) => {
+                    const div = document.createElement('div');
+                    div.className = 'stat-item';
+                    const match = sample.correct ? '✅' : '❌';
+                    div.innerHTML = `
+                        <div>
+                            <strong>Sample ${idx + 1}</strong> ${match}<br>
+                            Sepal: ${sample.features.sepal_length.toFixed(2)}cm × ${sample.features.sepal_width.toFixed(2)}cm<br>
+                            Petal: ${sample.features.petal_length.toFixed(2)}cm × ${sample.features.petal_width.toFixed(2)}cm<br>
+                            <span style="color: var(--accent);">Predicted:</span> ${sample.predicted} | 
+                            <span style="color: var(--success);">Actual:</span> ${sample.actual}
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            } catch (error) {
+                console.error('Error loading sample predictions:', error);
+            }
+        }
+
+        // Form Submission
+        document.getElementById('predictionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('predictBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Analyzing...';
+            
+            try {
+                const data = {
+                    sepal_length: parseFloat(document.getElementById('sepal_length').value),
+                    sepal_width: parseFloat(document.getElementById('sepal_width').value),
+                    petal_length: parseFloat(document.getElementById('petal_length').value),
+                    petal_width: parseFloat(document.getElementById('petal_width').value)
+                };
+                
+                const response = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!response.ok) throw new Error('Prediction failed');
+                
+                const result = await response.json();
+                
+                // Display results
+                const resultBox = document.getElementById('resultBox');
+                document.getElementById('predictionClass').textContent = result.prediction;
+                document.getElementById('confidence').textContent = result.confidence.toFixed(1) + '%';
+                
+                // Probability bars
+                const probBars = document.getElementById('probabilityBars');
+                probBars.innerHTML = '';
+                Object.entries(result.probabilities).forEach(([className, prob]) => {
+                    const div = document.createElement('div');
+                    div.className = 'prob-item';
+                    div.innerHTML = `
+                        <div class="prob-label">${className}</div>
+                        <div class="prob-bar">
+                            <div class="prob-fill" style="width: ${prob}%;">
+                                ${prob.toFixed(1)}%
+                            </div>
+                        </div>
+                    `;
+                    probBars.appendChild(div);
+                });
+                
+                resultBox.classList.add('show');
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>🚀 Predict Flower</span>';
+            }
+        });
+
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const tabName = btn.dataset.tab;
+                
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                btn.classList.add('active');
+                document.getElementById(tabName).classList.add('active');
+            });
+        });
+
+        // Load data on page load
+        window.addEventListener('load', loadModelData);
+    </script>
+</body>
+</html>
